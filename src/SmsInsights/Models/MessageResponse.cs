@@ -5,8 +5,8 @@ namespace SmsInsights.Models;
 /// </summary>
 public class MessageResponse
 {
-    public bool Success { get; }
-    public string Message { get; }
+    public bool Success { get; init; }
+    public string Message { get; init; }
 
     private MessageResponse(bool success, string message)
     {
@@ -15,8 +15,8 @@ public class MessageResponse
     }
 
     public static MessageResponse SuccessResponse(string message) =>
-        new MessageResponse(true, message);
+        new(true, message);
 
     public static MessageResponse FailureResponse(string message) =>
-        new MessageResponse(false, message);
+        new(false, message);
 }
