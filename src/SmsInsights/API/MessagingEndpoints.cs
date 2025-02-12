@@ -20,6 +20,14 @@ public static class MessagingEndpoints
         app.MapPost("/api/message/send", SendMessage)
             .WithTags("Messaging")
             .WithOpenApi(); 
+        
+        app.MapGet("/api/metrics/global", GetGlobalMetrics)
+            .WithTags("Monitoring")
+            .WithOpenApi();
+        
+        app.MapGet("/api/metrics/sender/{senderNumber}", GetSenderMetrics)
+            .WithTags("Monitoring")
+            .WithOpenApi();
     }
 
     /// <summary>
@@ -39,5 +47,26 @@ public static class MessagingEndpoints
         Log.Information("Processing message request from {Sender}", request.SenderPhoneNumber);
         var response = messageService.SendMessage(request);
         return response.Success ? Results.Ok(response) : Results.BadRequest(response);
+    }
+
+    private static IResult GetGlobalMetrics(IRateLimiterService rateLimiter)
+    {
+        var metrics = new
+        {
+            UsagePercentage = rateLimiter.GetGlobalUsagePercentage(),
+            Timestamp = DateTime.UtcNow
+        };
+        return Results.Ok(metrics);
+    }
+
+    private static IResult GetSenderMetrics(string senderNumber, IRateLimiterService rateLimiter)
+    {
+        var metrics = new
+        {
+            SenderNumber = senderNumber,
+            UsagePercentage = rateLimiter.GetSenderUsagePercentage(senderNumber),
+            Timestamp = DateTime.UtcNow
+        };
+        return Results.Ok(metrics);
     }
 }
