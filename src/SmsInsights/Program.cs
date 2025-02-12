@@ -20,7 +20,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnection);
 
 // Register Redis service and rate limiter service
 builder.Services.AddSingleton<IRedisService, RedisService>();
-builder.Services.AddSingleton<IRateLimiter>(sp => new RateLimiterService(
+builder.Services.AddSingleton<IRateLimiterService>(sp => new RateLimiterService(
     sp.GetRequiredService<IRedisService>(), 
     appSettings.RateLimits.MaxMessagesPerSenderPerSec, 
     appSettings.RateLimits.MaxMessagesGlobalPerSec

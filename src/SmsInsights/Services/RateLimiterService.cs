@@ -5,7 +5,7 @@ namespace SmsInsights.Services;
 /// <summary>
 /// Implements rate limiting using Redis.
 /// </summary>
-public class RateLimiterService : IRateLimiter
+public class RateLimiterService : IRateLimiterService
 {
     private readonly IRedisService _redisService;
     private readonly int _maxMessagesPerSenderPerSec;
