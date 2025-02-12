@@ -73,7 +73,7 @@ API will be available at: `http://localhost:5000`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/api/message/send` | Check if an SMS can be sent without exceeding limits |
-| `GET` | `/api/sms/stats` | Retrieve current SMS rate usage per number/account |
+
 
 Example Request:
 ```json
