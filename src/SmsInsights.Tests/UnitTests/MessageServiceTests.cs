@@ -94,4 +94,56 @@ public class MessageServiceTests
         Assert.False(result.Success);
         Assert.Equal(ApiResponseMessages.RateLimitExceeded, result.Message);
     }
+
+    [Fact]
+    public void SendMessage_WhenApproachingGlobalLimit_StillSucceeds()
+    {
+        // Arrange
+        var request = new SmsRequest { SenderPhoneNumber = "+1234567890" };
+        _rateLimiter.CanSendGlobal().Returns(true);
+        _rateLimiter.CanSend(request.SenderPhoneNumber).Returns(true);
+        _rateLimiter.GetGlobalUsagePercentage().Returns(95); // 95% of limit
+
+        // Act
+        var result = _messageService.SendMessage(request);
+
+        // Assert
+        Assert.True(result.Success);
+        // Verify warning or metrics are logged (if implemented)
+    }
+
+    [Fact]
+    public void SendMessage_WhenApproachingSenderLimit_StillSucceeds()
+    {
+        // Arrange
+        var request = new SmsRequest { SenderPhoneNumber = "+1234567890" };
+        _rateLimiter.CanSendGlobal().Returns(true);
+        _rateLimiter.CanSend(request.SenderPhoneNumber).Returns(true);
+        _rateLimiter.GetSenderUsagePercentage(request.SenderPhoneNumber).Returns(90); // 90% of limit
+
+        // Act
+        var result = _messageService.SendMessage(request);
+
+        // Assert
+        Assert.True(result.Success);
+        // Verify warning or metrics are logged (if implemented)
+    }
+
+    [Fact]
+    public void SendMessage_WhenBothLimitsApproaching_StillSucceeds()
+    {
+        // Arrange
+        var request = new SmsRequest { SenderPhoneNumber = "+1234567890" };
+        _rateLimiter.CanSendGlobal().Returns(true);
+        _rateLimiter.CanSend(request.SenderPhoneNumber).Returns(true);
+        _rateLimiter.GetGlobalUsagePercentage().Returns(95);
+        _rateLimiter.GetSenderUsagePercentage(request.SenderPhoneNumber).Returns(90);
+
+        // Act
+        var result = _messageService.SendMessage(request);
+
+        // Assert
+        Assert.True(result.Success);
+        // Verify appropriate warnings or metrics are logged (if implemented)
+    }
 } 

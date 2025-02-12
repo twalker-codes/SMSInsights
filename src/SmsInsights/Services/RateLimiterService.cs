@@ -44,4 +44,18 @@ public class RateLimiterService : IRateLimiterService
         var globalKey = $"global_rate_limit:{DateTime.UtcNow:yyyyMMddHHmmss}";
         return _redisService.IncrementWithExpiration(globalKey, _maxMessagesGlobalPerSec);
     }
+
+    public int GetGlobalUsagePercentage()
+    {
+        var globalKey = $"global_rate_limit:{DateTime.UtcNow:yyyyMMddHHmmss}";
+        var currentCount = _redisService.GetCount(globalKey);
+        return (int)((currentCount * 100.0) / _maxMessagesGlobalPerSec);
+    }
+
+    public int GetSenderUsagePercentage(string senderNumber)
+    {
+        var senderKey = $"rate_limit:{senderNumber}:{DateTime.UtcNow:yyyyMMddHHmmss}";
+        var currentCount = _redisService.GetCount(senderKey);
+        return (int)((currentCount * 100.0) / _maxMessagesPerSenderPerSec);
+    }
 }

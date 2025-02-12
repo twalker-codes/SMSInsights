@@ -48,4 +48,15 @@ public class RedisService : IRedisService
     {
         _redisDb.KeyDelete(key);
     }
+
+    /// <summary>
+    /// Retrieves the count of a Redis key.
+    /// </summary>
+    /// <param name="key">The Redis key.</param>
+    /// <returns>The count of the Redis key.</returns>
+    public int GetCount(string key)
+    {
+        var value = _redisDb.StringGet(key);
+        return value.HasValue ? (int)value : 0;
+    }
 }

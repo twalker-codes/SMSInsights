@@ -33,4 +33,11 @@ public interface IRedisService
     /// </summary>
     /// <param name="key">The Redis key.</param>
     void Delete(string key);
+
+    /// <summary>
+    /// Retrieves the count of a Redis key.
+    /// </summary>
+    /// <param name="key">The Redis key.</param>
+    /// <returns>The count of the Redis key.</returns>
+    int GetCount(string key);
 }
