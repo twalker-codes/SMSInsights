@@ -1,11 +1,6 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OpenApi;
 using SmsInsights.Interfaces;
 using SmsInsights.Models;
-using SmsInsights.Options;
-using Swashbuckle.AspNetCore.Annotations;
 using Serilog;
 
 namespace SmsInsights.Api;

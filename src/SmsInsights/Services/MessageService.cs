@@ -1,7 +1,6 @@
 using SmsInsights.Interfaces;
 using SmsInsights.Models;
 using SmsInsights.Options;
-using Serilog;
 
 namespace SmsInsights.Services;
 
