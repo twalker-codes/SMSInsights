@@ -96,9 +96,15 @@ Example Response:
 
 | Package | Description | NuGet URL |
 |---------|-------------|------------|
-| `Microsoft.AspNetCore.Mvc.Core` | Core MVC framework for ASP.NET | [NuGet](https://www.nuget.org/packages/Microsoft.AspNetCore.Mvc.Core/) |
+| `Microsoft.AspNetCore.OpenApi` | Provides APIs for annotating endpoints | [NuGet](https://www.nuget.org/packages/Microsoft.AspNetCore.OpenApi/9.0.2/) |
 | `StackExchange.Redis` | Redis client for .NET | [NuGet](https://www.nuget.org/packages/StackExchange.Redis/) |
-
+| `Serilog.AspNetCore ` | Serilog.Settings.Configuration | [Github](https://github.com/serilog/serilog-aspnetcore/) |
+| `Serilog.Settings.Configuration` | Support for Serilog | [Github](https://github.com/serilog/serilog-settings-configuration/) |
+| `Serilog.Sinks.Console` | Support for Serilog | [Github](https://github.com/serilog/serilog-sinks-console/) |
+| `Serilog.Sinks.File` | Support for Serilog | [Github](https://github.com/serilog/serilog-sinks-file/) |
+| `Swashbuckle.AspNetCore` | Swagger tools for doc | [Github](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) |
+| `xunit` |  Testing framework | [Nuget](https://www.nuget.org/packages/xunit/2.9.3/license) |
+| `NSubstitute` |  mocking framework | [Github](https://nsubstitute.github.io/) |
 ---
 
 ## 📌 Contributing
