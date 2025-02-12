@@ -1,0 +1,178 @@
+{
+	"info": {
+		"_postman_id": "5529e6ca-1c66-4291-bfda-41400194883d",
+		"name": "SmsInsights API Workspace",
+		"description": "Postman collection to test the good and bad paths for the SmsInsights microservice endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40802660"
+	},
+	"item": [
+		{
+			"name": "Send Message (Success)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"SenderPhoneNumber\": \"+15551234567\",\n  \"RecipientPhoneNumber\": \"+15557654321\",\n  \"Message\": \"Hello, this is a test message.\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/message/send",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"message",
+						"send"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send Message (Failure)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"RecipientPhoneNumber\": \"+15557654321\",\n  \"Message\": \"This message is missing the sender phone number.\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/message/send",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"message",
+						"send"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Global Metrics",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/metrics/global",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"metrics",
+						"global"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Sender Metrics",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/metrics/sender/{{testSender}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"metrics",
+						"sender",
+						"{{testSender}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000"
+		},
+		{
+			"key": "testSender",
+			"value": "+15551234567"
+		}
+	]
+}
