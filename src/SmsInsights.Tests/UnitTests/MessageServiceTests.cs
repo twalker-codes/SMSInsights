@@ -10,11 +10,11 @@ namespace SmsInsights.Tests.UnitTests;
 public class MessageServiceTests
 {
     private readonly IMessageService _messageService;
-    private readonly IRateLimiter _rateLimiter;
+    private readonly IRateLimiterService _rateLimiter;
 
     public MessageServiceTests()
     {
-        _rateLimiter = Substitute.For<IRateLimiter>();
+        _rateLimiter = Substitute.For<IRateLimiterService>();
         _messageService = new MessageService(_rateLimiter);
     }
 

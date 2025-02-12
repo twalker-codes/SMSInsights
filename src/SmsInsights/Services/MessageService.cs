@@ -6,9 +6,9 @@ namespace SmsInsights.Services;
 
 public class MessageService : IMessageService
 {
-    private readonly IRateLimiter _rateLimiter;
+    private readonly IRateLimiterService _rateLimiter;
 
-    public MessageService(IRateLimiter rateLimiter)
+    public MessageService(IRateLimiterService rateLimiter)
     {
         _rateLimiter = rateLimiter;
     }

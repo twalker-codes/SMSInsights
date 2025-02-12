@@ -7,7 +7,7 @@ namespace SmsInsights.Tests.UnitTests;
 
 public class RateLimiterServiceTests
 {
-    private readonly IRateLimiter _rateLimiter;
+    private readonly IRateLimiterService _rateLimiter;
     private readonly IRedisService _redisService;
     private const int MaxMessagesPerSenderPerSec = 10;
     private const int MaxMessagesGlobalPerSec = 100;
