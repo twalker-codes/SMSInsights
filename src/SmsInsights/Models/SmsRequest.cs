@@ -7,11 +7,11 @@ using System.ComponentModel.DataAnnotations;
 public class SmsRequest
 {
     [Required]
-    public string SenderPhoneNumber { get; set; } = string.Empty;
+    public string? SenderPhoneNumber { get; set; }
     
     [Required]
-    public string ReceiverPhoneNumber { get; set; } = string.Empty;
+    public string? ReceiverPhoneNumber { get; set; }
     
     [Required]
-    public string Message { get; set; } = string.Empty;
+    public string? Message { get; set; }
 }

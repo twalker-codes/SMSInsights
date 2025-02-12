@@ -15,6 +15,9 @@ public class MessageService : IMessageService
 
     public bool CanSendMessage(SmsRequest request)
     {
+        if (string.IsNullOrEmpty(request.SenderPhoneNumber))
+            return false;
+        
         return _rateLimiter.CanSendGlobal() && _rateLimiter.CanSend(request.SenderPhoneNumber);
     }
 

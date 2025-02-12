@@ -17,9 +17,9 @@ public static class MessagingEndpoints
     /// <param name="app">The web application.</param>
     public static void RegisterMessagingEndpoints(this WebApplication app)
     {
-        app.MapPost("/api/sms/can-send", SendMessage)
+        app.MapPost("/api/message/send", SendMessage)
             .WithTags("Messaging")
-            .WithOpenApi(); // Now this method will work
+            .WithOpenApi(); 
     }
 
     /// <summary>
