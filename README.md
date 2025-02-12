@@ -16,7 +16,7 @@
 - 🏗 **.NET Core 7+**
 - 🏗 **ASP.NET Core Web API**
 - 🏗 **Redis (for distributed rate limiting)**
-- 🏗 **Entity Framework Core**
+
 
 ---
 
@@ -72,7 +72,7 @@ API will be available at: `http://localhost:5000`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/sms/can-send` | Check if an SMS can be sent without exceeding limits |
+| `POST` | `/api/message/send` | Check if an SMS can be sent without exceeding limits |
 | `GET` | `/api/sms/stats` | Retrieve current SMS rate usage per number/account |
 
 Example Request:
