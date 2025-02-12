@@ -1,7 +1,5 @@
 # 📩 SMSInsights - SMS Rate Limiter Microservice
 
-![SMSInsights](img/smsinsights-banner.png)
-
 **SMSInsights** is a .NET Core microservice designed to act as a gatekeeper for sending SMS messages, ensuring that messages do not exceed the rate limits imposed by an external SMS provider. This helps businesses avoid unnecessary API costs while ensuring reliable message delivery.
 
 ---
@@ -11,8 +9,6 @@
 - ✅ Prevents unnecessary API calls when limits are exceeded.
 - ✅ Real-time rate limit tracking using in-memory or distributed caching.
 - ✅ Scalable to handle high request volumes efficiently.
-
-![Rate Limiting](img/rate-limiting.png)
 
 ---
 
@@ -94,9 +90,6 @@ Example Response:
   "remainingQuota": 3
 }
 ```
-
-![API Usage](img/api-usage.png)
-
 ---
 
 ## 📦 NuGet Packages Used
