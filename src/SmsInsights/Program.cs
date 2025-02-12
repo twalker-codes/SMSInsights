@@ -4,6 +4,8 @@ using SmsInsights.Data;
 using SmsInsights.Options;
 using StackExchange.Redis;
 using Serilog;
+using SmsInsights.Models;
+using SmsInsights.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,10 +28,16 @@ builder.Services.AddSingleton<IRateLimiter>(sp => new RateLimiterService(
 
 builder.Services.AddSingleton<IMessageService, MessageService>();
 
+// Add Swagger services
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }
 
-// Register API Endpoints
+// Replace direct endpoint mapping with MessagingEndpoints registration
+app.RegisterMessagingEndpoints();
+
 app.Run();
 Log.CloseAndFlush();
