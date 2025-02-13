@@ -1,21 +1,32 @@
 {
-	"info": {
-		"_postman_id": "5529e6ca-1c66-4291-bfda-41400194883d",
-		"name": "SmsInsights API Workspace",
-		"description": "Postman collection to test the good and bad paths for the SmsInsights microservice endpoints",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "40802660"
-	},
-	"item": [
+    "info": {
+        "_postman_id": "5529e6ca-1c66-4291-bfda-41400194883d",
+        "name": "SmsInsights API Workspace",
+        "description": "Postman collection to test the good and bad paths for the SmsInsights microservice endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "40802660"
+    },
+    "item": [
         {
             "name": "Send SMS Message",
             "request": {
                 "method": "POST",
-                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
                 "url": {
-                    "raw": "http://localhost:5000/api/message/send",
-                    "host": ["http://localhost:5000"],
-                    "path": ["api", "message", "send"]
+                    "raw": "{{baseUrl}}/api/message/send",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "message",
+                        "send"
+                    ]
                 },
                 "body": {
                     "mode": "raw",
@@ -31,60 +42,66 @@
                 }
             ]
         },
-		{
-			"name": "Send Message (Failure)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"pm.test('Status code is 400', function () {",
-							"    pm.response.to.have.status(400);",
-							"});"
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"RecipientPhoneNumber\": \"+15557654321\",\n  \"Message\": \"This message is missing the sender phone number.\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/api/message/send",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"message",
-						"send"
-					]
-				}
-			},
-			"response": []
-		},
+        {
+            "name": "Send Message (Failure)",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test('Status code is 400', function () {",
+                            "    pm.response.to.have.status(400);",
+                            "});"
+                        ]
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"RecipientPhoneNumber\": \"+15557654321\",\n  \"Message\": \"This message is missing the sender phone number.\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/message/send",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "message",
+                        "send"
+                    ]
+                }
+            },
+            "response": []
+        },
         {
             "name": "Get Global Metrics",
             "request": {
                 "method": "GET",
                 "url": {
-                    "raw": "http://localhost:5000/api/metrics/global",
-                    "host": ["http://localhost:5000"],
-                    "path": ["api", "metrics", "global"]
+                    "raw": "{{baseUrl}}/api/metrics/global",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "metrics",
+                        "global"
+                    ]
                 }
             },
             "response": [
@@ -101,9 +118,16 @@
             "request": {
                 "method": "GET",
                 "url": {
-                    "raw": "http://localhost:5000/api/metrics/sender/+15551234567",
-                    "host": ["http://localhost:5000"],
-                    "path": ["api", "metrics", "sender", "+15551234567"]
+                    "raw": "{{baseUrl}}/api/metrics/sender/+15551234567",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "metrics",
+                        "sender",
+                        "+15551234567"
+                    ]
                 }
             },
             "response": [
@@ -120,9 +144,14 @@
             "request": {
                 "method": "GET",
                 "url": {
-                    "raw": "http://localhost:5000/api/health",
-                    "host": ["http://localhost:5000"],
-                    "path": ["api", "health"]
+                    "raw": "{{baseUrl}}/api/health",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "health"
+                    ]
                 }
             },
             "response": [
@@ -133,6 +162,12 @@
                     "body": "{\n    \"Status\": \"Healthy\"\n}"
                 }
             ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:5000"
         }
     ]
 }
