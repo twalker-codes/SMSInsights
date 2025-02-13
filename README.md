@@ -157,7 +157,7 @@ Example Response:
 }
 ```
 
-The api will be available at: http://localhost:5000
+The api will be available at:  `http://localhost:3000`
 ---
 
 ## 📦 NuGet Packages Used
