@@ -127,6 +127,7 @@ Or using npm:
 ```sh
 npm start
 ```
+Application  will be available at: `http://localhost:3000`
 ---
 
 ## 📝 API Endpoints
