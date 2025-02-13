@@ -65,6 +65,9 @@ builder.Services.AddSingleton<IRateLimiterService>(sp => new RateLimiterService(
 ));
 builder.Services.AddSingleton<IMessageService, MessageService>();
 
+// Add this with the other service registrations
+builder.Services.AddSingleton<IMetricsService, MetricsService>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

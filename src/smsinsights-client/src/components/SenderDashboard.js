@@ -4,35 +4,27 @@ import API_ENDPOINTS from '../config';
 
 function SenderDashboard() {
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  const [fromDate, setFromDate] = useState(
+    new Date(Date.now() - 3600000).toISOString().slice(0, 16) // 1 hour ago
+  );
+  const [toDate, setToDate] = useState(
+    new Date().toISOString().slice(0, 16)
+  );
   const [senderUsage, setSenderUsage] = useState(null);
-  const [apiResponse, setApiResponse] = useState(null);
 
-  // Fetch sender usage based on the entered phone number and date range.
   async function fetchSenderUsage() {
     if (phoneNumber.trim() === '') return;
     try {
-      const url = `${API_ENDPOINTS.senderUsage}/${encodeURIComponent(phoneNumber)}`;
+      const url = `${API_ENDPOINTS.senderUsage}/${encodeURIComponent(phoneNumber)}?from=${fromDate}&to=${toDate}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error('Network error');
       const data = await response.json();
       setSenderUsage(data);
-      setApiResponse({
-        status: response.status,
-        timestamp: new Date().toLocaleString()
-      });
     } catch (err) {
       console.error(err);
-      setApiResponse({
-        status: 'Error',
-        message: err.message,
-        timestamp: new Date().toLocaleString()
-      });
     }
   }
 
-  // Poll the backend for sender usage once a phone number is specified.
   useEffect(() => {
     if (phoneNumber.trim() === '') return;
     fetchSenderUsage();
@@ -54,20 +46,16 @@ function SenderDashboard() {
         <TextField
           label="From Date/Time"
           type="datetime-local"
-          InputLabelProps={{
-            shrink: true,
-          }}
           value={fromDate}
           onChange={(e) => setFromDate(e.target.value)}
+          InputLabelProps={{ shrink: true }}
         />
         <TextField
           label="To Date/Time"
           type="datetime-local"
-          InputLabelProps={{
-            shrink: true,
-          }}
           value={toDate}
           onChange={(e) => setToDate(e.target.value)}
+          InputLabelProps={{ shrink: true }}
         />
         <Button variant="contained" onClick={fetchSenderUsage}>
           Filter
@@ -76,25 +64,19 @@ function SenderDashboard() {
       {senderUsage ? (
         <Box>
           <Typography variant="body1">
-            Messages per second: {senderUsage.currentCount} / {senderUsage.maxCount}
+            Average Usage: {senderUsage.averageUsagePercentage.toFixed(1)}%
           </Typography>
           <Typography variant="body1">
-            Usage: {senderUsage.usagePercentage}%
+            Total Messages: {senderUsage.totalMessageCount}
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            Period: {new Date(senderUsage.fromTime).toLocaleString()} - {new Date(senderUsage.toTime).toLocaleString()}
           </Typography>
         </Box>
       ) : (
         <Typography variant="body1">
           Enter a sender phone number to view usage.
         </Typography>
-      )}
-      {apiResponse && (
-        <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
-          <Typography variant="body2" color="textSecondary">
-            Last API Call: {apiResponse.status === 'Error' ? 
-              `Error - ${apiResponse.message}` : 
-              `Success (${apiResponse.status})`} at {apiResponse.timestamp}
-          </Typography>
-        </Box>
       )}
     </Paper>
   );

@@ -30,17 +30,38 @@ public static class MessagingEndpoints
             .WithOpenApi();
 
         // Update the health check endpoint
-        app.MapGet("/api/health", (HttpContext context) => 
+        app.MapGet("/api/health", async (HttpContext context) => 
         {
-            Log.Information("Health check requested from {Origin}", context.Request.Headers.Origin);
-            
-            var response = new { 
-                status = "Healthy", 
-                timestamp = DateTime.UtcNow 
-            };
-            
-            Log.Information("Returning health check response: {@Response}", response);
-            return Results.Ok(response);
+            try
+            {
+                // Simple Redis check
+                var redisService = context.RequestServices.GetRequiredService<IRedisService>();
+                var isRedisConnected = await Task.Run(() => {
+                    try
+                    {
+                        redisService.GetCount("health_check");
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                });
+
+                if (!isRedisConnected)
+                {
+                    return Results.StatusCode(503);
+                }
+
+                return Results.Ok(new { 
+                    status = "Healthy", 
+                    timestamp = DateTime.UtcNow
+                });
+            }
+            catch
+            {
+                return Results.StatusCode(500);
+            }
         })
         .WithTags("Health")
         .WithOpenApi();
@@ -65,24 +86,15 @@ public static class MessagingEndpoints
         return response.Success ? Results.Ok(response) : Results.BadRequest(response);
     }
 
-    private static IResult GetGlobalMetrics(IRateLimiterService rateLimiter)
+    private static IResult GetGlobalMetrics([FromQuery] DateTime from, [FromQuery] DateTime to, IMetricsService metricsService)
     {
-        var metrics = new
-        {
-            UsagePercentage = rateLimiter.GetGlobalUsagePercentage(),
-            Timestamp = DateTime.UtcNow
-        };
+        var metrics = metricsService.GetAggregatedGlobalMetrics(from, to);
         return Results.Ok(metrics);
     }
 
-    private static IResult GetSenderMetrics(string senderNumber, IRateLimiterService rateLimiter)
+    private static IResult GetSenderMetrics(string senderNumber, [FromQuery] DateTime from, [FromQuery] DateTime to, IMetricsService metricsService)
     {
-        var metrics = new
-        {
-            SenderNumber = senderNumber,
-            UsagePercentage = rateLimiter.GetSenderUsagePercentage(senderNumber),
-            Timestamp = DateTime.UtcNow
-        };
+        var metrics = metricsService.GetAggregatedSenderMetrics(senderNumber, from, to);
         return Results.Ok(metrics);
     }
 }

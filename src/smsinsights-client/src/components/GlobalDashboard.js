@@ -1,63 +1,69 @@
 import React, { useState, useEffect } from 'react';
-import { Paper, Typography, Box } from '@mui/material';
+import { Paper, Typography, Box, TextField } from '@mui/material';
 import API_ENDPOINTS from '../config';
 
 function GlobalDashboard() {
   const [globalUsage, setGlobalUsage] = useState(null);
-  const [apiResponse, setApiResponse] = useState(null);
+  const [fromDate, setFromDate] = useState(
+    new Date(Date.now() - 3600000).toISOString().slice(0, 16) // 1 hour ago
+  );
+  const [toDate, setToDate] = useState(
+    new Date().toISOString().slice(0, 16)
+  );
 
-  // Poll the backend every second for live global usage data.
   useEffect(() => {
     async function fetchGlobalUsage() {
       try {
-        const response = await fetch(API_ENDPOINTS.globalUsage);
+        const url = `${API_ENDPOINTS.globalUsage}?from=${fromDate}&to=${toDate}`;
+        const response = await fetch(url);
         if (!response.ok) throw new Error('Network error');
         const data = await response.json();
         setGlobalUsage(data);
-        setApiResponse({
-          status: response.status,
-          timestamp: new Date().toLocaleString()
-        });
       } catch (err) {
         console.error(err);
-        setApiResponse({
-          status: 'Error',
-          message: err.message,
-          timestamp: new Date().toLocaleString()
-        });
       }
     }
 
     fetchGlobalUsage();
     const interval = setInterval(fetchGlobalUsage, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fromDate, toDate]);
 
   return (
     <Paper sx={{ p: 3, mt: 3 }}>
       <Typography variant="h6" gutterBottom>
         Global Rate Limit Usage
       </Typography>
+      <Box sx={{ mb: 2, display: 'flex', gap: 2 }}>
+        <TextField
+          label="From Date/Time"
+          type="datetime-local"
+          value={fromDate}
+          onChange={(e) => setFromDate(e.target.value)}
+          InputLabelProps={{ shrink: true }}
+        />
+        <TextField
+          label="To Date/Time"
+          type="datetime-local"
+          value={toDate}
+          onChange={(e) => setToDate(e.target.value)}
+          InputLabelProps={{ shrink: true }}
+        />
+      </Box>
       {globalUsage ? (
         <Box>
           <Typography variant="body1">
-            Usage: {globalUsage.usagePercentage}%
+            Average Usage: {globalUsage.averageUsagePercentage.toFixed(1)}%
+          </Typography>
+          <Typography variant="body1">
+            Total Messages: {globalUsage.totalMessageCount}
           </Typography>
           <Typography variant="body2" color="textSecondary">
-            Last Updated: {new Date(globalUsage.timestamp).toLocaleString()}
+            Period: {new Date(globalUsage.fromTime).toLocaleString()} - {new Date(globalUsage.toTime).toLocaleString()}
           </Typography>
         </Box>
       ) : (
         <Typography variant="body1">Loading...</Typography>
-      )}
-      {apiResponse && (
-        <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
-          <Typography variant="body2" color="textSecondary">
-            Last API Call: {apiResponse.status === 'Error' ? 
-              `Error - ${apiResponse.message}` : 
-              `Success (${apiResponse.status})`} at {apiResponse.timestamp}
-          </Typography>
-        </Box>
       )}
     </Paper>
   );

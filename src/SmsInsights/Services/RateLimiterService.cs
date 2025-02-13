@@ -93,4 +93,19 @@ public class RateLimiterService : IRateLimiterService
         var maxCount = Math.Max(currentCount, previousCount);
         return (int)((maxCount * 100.0) / _maxMessagesPerSenderPerSec);
     }
+
+    public int GetCountForKey(string key)
+    {
+        return _redisService.GetCount(key);
+    }
+
+    public int GetMaxMessagesPerSender()
+    {
+        return _maxMessagesPerSenderPerSec;
+    }
+
+    public int GetMaxMessagesGlobal()
+    {
+        return _maxMessagesGlobalPerSec;
+    }
 }
