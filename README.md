@@ -153,8 +153,6 @@ Example Response:
     "message": "Message sent successfully."
 }
 ```
-
-The api will be available at:  `http://localhost:3000`
 ---
 
 ## 📦 NuGet Packages Used
