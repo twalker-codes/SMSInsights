@@ -7,52 +7,30 @@
 		"_exporter_id": "40802660"
 	},
 	"item": [
-		{
-			"name": "Send Message (Success)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"pm.test('Status code is 200', function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"SenderPhoneNumber\": \"+15551234567\",\n  \"RecipientPhoneNumber\": \"+15557654321\",\n  \"Message\": \"Hello, this is a test message.\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/api/message/send",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"message",
-						"send"
-					]
-				}
-			},
-			"response": []
-		},
+        {
+            "name": "Send SMS Message",
+            "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "url": {
+                    "raw": "http://localhost:5000/api/message/send",
+                    "host": ["http://localhost:5000"],
+                    "path": ["api", "message", "send"]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"SenderPhoneNumber\": \"+15551234567\",\n    \"ReceiverPhoneNumber\": \"+15557654321\",\n    \"Message\": \"Hello, this is a test message.\"\n}"
+                }
+            },
+            "response": [
+                {
+                    "name": "Success Response",
+                    "status": "200 OK",
+                    "code": 200,
+                    "body": "{\n    \"success\": true,\n    \"message\": \"Message sent successfully.\"\n}"
+                }
+            ]
+        },
 		{
 			"name": "Send Message (Failure)",
 			"event": [
@@ -99,80 +77,62 @@
 			},
 			"response": []
 		},
-		{
-			"name": "Get Global Metrics",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"pm.test('Status code is 200', function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/api/metrics/global",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"metrics",
-						"global"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Sender Metrics",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"pm.test('Status code is 200', function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/api/metrics/sender/{{testSender}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"metrics",
-						"sender",
-						"{{testSender}}"
-					]
-				}
-			},
-			"response": []
-		}
-	],
-	"variable": [
-		{
-			"key": "baseUrl",
-			"value": "http://localhost:5000"
-		},
-		{
-			"key": "testSender",
-			"value": "+15551234567"
-		}
-	]
+        {
+            "name": "Get Global Metrics",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:5000/api/metrics/global",
+                    "host": ["http://localhost:5000"],
+                    "path": ["api", "metrics", "global"]
+                }
+            },
+            "response": [
+                {
+                    "name": "Success Response",
+                    "status": "200 OK",
+                    "code": 200,
+                    "body": "{\n    \"UsagePercentage\": 75.5,\n    \"Timestamp\": \"2024-02-13T12:34:56Z\"\n}"
+                }
+            ]
+        },
+        {
+            "name": "Get Sender Metrics",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:5000/api/metrics/sender/+15551234567",
+                    "host": ["http://localhost:5000"],
+                    "path": ["api", "metrics", "sender", "+15551234567"]
+                }
+            },
+            "response": [
+                {
+                    "name": "Success Response",
+                    "status": "200 OK",
+                    "code": 200,
+                    "body": "{\n    \"SenderNumber\": \"+15551234567\",\n    \"UsagePercentage\": 60.3,\n    \"Timestamp\": \"2024-02-13T12:34:56Z\"\n}"
+                }
+            ]
+        },
+        {
+            "name": "Health Check",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:5000/api/health",
+                    "host": ["http://localhost:5000"],
+                    "path": ["api", "health"]
+                }
+            },
+            "response": [
+                {
+                    "name": "Success Response",
+                    "status": "200 OK",
+                    "code": 200,
+                    "body": "{\n    \"Status\": \"Healthy\"\n}"
+                }
+            ]
+        }
+    ]
 }
