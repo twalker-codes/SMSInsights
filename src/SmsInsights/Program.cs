@@ -9,8 +9,16 @@ using SmsInsights.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load configuration settings
+// Configure Serilog using the settings in appsettings.json (and any environment specific override)
+builder.Host.UseSerilog((context, loggerConfig) =>
+{
+    loggerConfig.ReadFrom.Configuration(context.Configuration);
+});
+
+// Bind the ApplicationSettings section and register for DI using IOptions<ApplicationSettings> if needed.
+builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("ApplicationSettings"));
 var appSettings = builder.Configuration.GetSection("ApplicationSettings").Get<ApplicationSettings>();
+
 if (appSettings == null)
 {
     appSettings = new ApplicationSettings();
@@ -18,10 +26,11 @@ if (appSettings == null)
 }
 builder.Services.AddSingleton(appSettings);
 
-// Use the ReactClient settings from the ApplicationSettings
-var reactClientOrigin = appSettings.ReactClient.Origin;
+// Optional: log the current environment for verification
+Log.Information("Running in {Environment} environment", builder.Environment.EnvironmentName);
 
-// Add CORS configuration to allow requests from the React client.
+// Register CORS using the React client origin from configuration.
+var reactClientOrigin = appSettings.ReactClient.Origin;
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactClient", policy =>
@@ -32,10 +41,12 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Configure Redis and other services as usual...
+// Configure the Redis connection.
 var redisConnection = ConnectionMultiplexer.Connect(appSettings.Redis.ConnectionString);
 builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnection);
 builder.Services.AddSingleton<IRedisService, RedisService>();
+
+// Configure the RateLimiterService using values from ApplicationSettings.
 builder.Services.AddSingleton<IRateLimiterService>(sp => new RateLimiterService(
     sp.GetRequiredService<IRedisService>(),
     appSettings.RateLimits.MaxMessagesPerSenderPerSec,
