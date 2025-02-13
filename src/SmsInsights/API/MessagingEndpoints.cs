@@ -30,10 +30,18 @@ public static class MessagingEndpoints
             .WithOpenApi();
 
         // Update the health check endpoint
-        app.MapGet("/api/health", () => Results.Ok(new { 
-            Status = "Healthy", 
-            Timestamp = DateTime.UtcNow 
-        }))
+        app.MapGet("/api/health", (HttpContext context) => 
+        {
+            Log.Information("Health check requested from {Origin}", context.Request.Headers.Origin);
+            
+            var response = new { 
+                status = "Healthy", 
+                timestamp = DateTime.UtcNow 
+            };
+            
+            Log.Information("Returning health check response: {@Response}", response);
+            return Results.Ok(response);
+        })
         .WithTags("Health")
         .WithOpenApi();
     }

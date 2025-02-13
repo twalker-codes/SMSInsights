@@ -7,6 +7,7 @@ function SenderDashboard() {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [senderUsage, setSenderUsage] = useState(null);
+  const [apiResponse, setApiResponse] = useState(null);
 
   // Fetch sender usage based on the entered phone number and date range.
   async function fetchSenderUsage() {
@@ -17,8 +18,17 @@ function SenderDashboard() {
       if (!response.ok) throw new Error('Network error');
       const data = await response.json();
       setSenderUsage(data);
+      setApiResponse({
+        status: response.status,
+        timestamp: new Date().toLocaleString()
+      });
     } catch (err) {
       console.error(err);
+      setApiResponse({
+        status: 'Error',
+        message: err.message,
+        timestamp: new Date().toLocaleString()
+      });
     }
   }
 
@@ -76,6 +86,15 @@ function SenderDashboard() {
         <Typography variant="body1">
           Enter a sender phone number to view usage.
         </Typography>
+      )}
+      {apiResponse && (
+        <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+          <Typography variant="body2" color="textSecondary">
+            Last API Call: {apiResponse.status === 'Error' ? 
+              `Error - ${apiResponse.message}` : 
+              `Success (${apiResponse.status})`} at {apiResponse.timestamp}
+          </Typography>
+        </Box>
       )}
     </Paper>
   );
