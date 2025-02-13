@@ -7,4 +7,5 @@ public class AggregatedGlobalMetrics
     public DateTime FromTime { get; set; }
     public DateTime ToTime { get; set; }
     public int WindowSeconds { get; set; }  // Add window size for context
+    public int CurrentMessagesPerSecond { get; set; }  // Add this property
 } 

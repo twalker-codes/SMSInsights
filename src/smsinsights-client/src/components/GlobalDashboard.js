@@ -58,6 +58,9 @@ function GlobalDashboard() {
           <Typography variant="body1">
             Total Messages: {globalUsage.totalMessageCount}
           </Typography>
+          <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+            Current Rate: {globalUsage.currentMessagesPerSecond} msgs/sec
+          </Typography>
           <Typography variant="body2" color="textSecondary">
             Period: {new Date(globalUsage.fromTime).toLocaleString()} - {new Date(globalUsage.toTime).toLocaleString()}
           </Typography>

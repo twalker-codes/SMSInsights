@@ -41,12 +41,17 @@ namespace SmsInsights.Services
             var totalCount = counts.Sum();
             var maxPossible = _rateLimiterService.GetMaxMessagesGlobal() * (to - from).TotalSeconds;
             
+            // Calculate current rate using most recent second
+            var currentSecondKey = $"global_rate_limit:{DateTime.UtcNow:yyyyMMddHHmmss}";
+            var currentRate = _redisService.GetCount(currentSecondKey);
+
             return new AggregatedGlobalMetrics
             {
                 AverageUsagePercentage = maxPossible > 0 ? (totalCount * 100.0) / maxPossible : 0,
                 TotalMessageCount = totalCount,
                 FromTime = from,
-                ToTime = to
+                ToTime = to,
+                CurrentMessagesPerSecond = currentRate
             };
         }
 

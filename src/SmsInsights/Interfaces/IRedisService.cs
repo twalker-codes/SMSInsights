@@ -40,4 +40,24 @@ public interface IRedisService
     /// <param name="key">The Redis key.</param>
     /// <returns>The count of the Redis key.</returns>
     int GetCount(string key);
+
+    /// <summary>
+    /// Retrieves a collection of Redis keys based on a pattern.
+    /// </summary>
+    /// <param name="pattern">The pattern to match keys.</param>
+    /// <returns>A collection of Redis keys.</returns>
+    IEnumerable<string> GetKeys(string pattern);
+
+    /// <summary>
+    /// Retrieves the last access time of a Redis key.
+    /// </summary>
+    /// <param name="key">The Redis key.</param>
+    /// <returns>The last access time of the Redis key.</returns>
+    DateTime GetLastAccessTime(string key);
+
+    /// <summary>
+    /// Deletes a key from Redis.
+    /// </summary>
+    /// <param name="key">The Redis key.</param>
+    void DeleteKey(string key);
 }

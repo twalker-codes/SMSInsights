@@ -57,6 +57,23 @@ public class RedisService : IRedisService
     public int GetCount(string key)
     {
         var value = _redisDb.StringGet(key);
-        return value.HasValue ? (int)value : 0;
+        return value.IsInteger ? (int)value : 0;
+    }
+
+    public IEnumerable<string> GetKeys(string pattern)
+    {
+        var server = _redisDb.Multiplexer.GetServer(_redisDb.Multiplexer.GetEndPoints().First());
+        return server.Keys(pattern: pattern).Select(k => k.ToString());
+    }
+
+    public DateTime GetLastAccessTime(string key)
+    {
+        var ttl = _redisDb.KeyTimeToLive(key);
+        return DateTime.UtcNow.Add(ttl ?? TimeSpan.Zero);
+    }
+
+    public void DeleteKey(string key)
+    {
+        Delete(key);
     }
 }

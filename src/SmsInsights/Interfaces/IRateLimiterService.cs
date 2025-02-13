@@ -7,4 +7,5 @@ public interface IRateLimiterService
     int GetCountForKey(string key);
     int GetMaxMessagesPerSender();
     int GetMaxMessagesGlobal();
+    void CleanupInactiveSenders(TimeSpan inactivityThreshold);
 } 

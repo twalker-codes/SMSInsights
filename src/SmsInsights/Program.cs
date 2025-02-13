@@ -55,7 +55,7 @@ builder.Services.AddCors(options =>
 // Configure the Redis connection.
 var redisConnection = ConnectionMultiplexer.Connect(appSettings.Redis.ConnectionString);
 builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnection);
-builder.Services.AddSingleton<IRedisService, RedisService>();
+builder.Services.AddSingleton<IRedisService, SmsInsights.Data.RedisService>();
 
 // Configure the RateLimiterService using values from ApplicationSettings.
 builder.Services.AddSingleton<IRateLimiterService>(sp => new RateLimiterService(

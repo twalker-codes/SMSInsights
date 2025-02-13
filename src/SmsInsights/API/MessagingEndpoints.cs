@@ -19,10 +19,12 @@ public static class MessagingEndpoints
     {
         app.MapPost("/api/message/send", SendMessage)
             .WithTags("Messaging")
+            .WithDescription("Sends an SMS message if within rate limits")
             .WithOpenApi(); 
         
         app.MapGet("/api/metrics/global", GetGlobalMetrics)
             .WithTags("Monitoring")
+            .WithDescription("Gets global rate limit usage metrics")
             .WithOpenApi();
         
         app.MapGet("/api/metrics/sender/{senderNumber}", GetSenderMetrics)
@@ -38,15 +40,31 @@ public static class MessagingEndpoints
     /// <returns>An HTTP response indicating success or failure.</returns>
     private static IResult SendMessage([FromBody] SmsRequest request, IMessageService messageService)
     {
-        var (isValid, errorMessage) = MessageValidator.ValidateRequest(request);
-        if (!isValid)
+        try
         {
-            return Results.BadRequest(MessageResponse.FailureResponse(errorMessage!));
-        }
+            var (isValid, errorMessage) = MessageValidator.ValidateRequest(request);
+            if (!isValid)
+            {
+                return Results.BadRequest(new { error = errorMessage });
+            }
 
-        Log.Information("Processing message request from {Sender}", request.SenderPhoneNumber);
-        var response = messageService.SendMessage(request);
-        return response.Success ? Results.Ok(response) : Results.BadRequest(response);
+            var response = messageService.SendMessage(request);
+            if (!response.Success)
+            {
+                return Results.BadRequest(new 
+                { 
+                    error = response.Message,
+                    rateLimitExceeded = true
+                });
+            }
+
+            return Results.Ok(response);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error processing message request");
+            return Results.StatusCode(500);
+        }
     }
 
     private static IResult GetGlobalMetrics([FromQuery] DateTime from, [FromQuery] DateTime to, IMetricsService metricsService)

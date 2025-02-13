@@ -101,4 +101,20 @@ public class RateLimiterService : IRateLimiterService
     {
         return _maxMessagesGlobalPerSec;
     }
+
+    public void CleanupInactiveSenders(TimeSpan inactivityThreshold)
+    {
+        var cutoffTime = DateTime.UtcNow.Subtract(inactivityThreshold);
+        var pattern = "rate_limit:*";
+        var keys = _redisService.GetKeys(pattern);
+        
+        foreach (var key in keys)
+        {
+            var lastAccess = _redisService.GetLastAccessTime(key);
+            if (lastAccess < cutoffTime)
+            {
+                _redisService.DeleteKey(key);
+            }
+        }
+    }
 }
