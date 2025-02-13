@@ -44,12 +44,22 @@ dotnet restore
 Create an **`appsettings.json`** file in the `SMSInsights.API` project:
 ```json
 {
-  "SmsProvider": {
-    "MaxMessagesPerNumberPerSecond": 5,
-    "MaxMessagesPerAccountPerSecond": 50
+  "ApplicationSettings": {
+    "RateLimits": {
+      "MaxMessagesPerSenderPerSec": 5,
+      "MaxMessagesGlobalPerSec": 20
+    },
+    "Redis": {
+      "ConnectionString": "localhost:6379"
+    }
   },
-  "ConnectionStrings": {
-    "Redis": "localhost:6379"
+  "Serilog": {
+    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
+    "MinimumLevel": "Information",
+    "WriteTo": [
+      { "Name": "Console" },
+      { "Name": "File", "Args": { "path": "logs/log-.txt", "rollingInterval": "Day" } }
+    ]
   }
 }
 ```
@@ -78,16 +88,17 @@ API will be available at: `http://localhost:5000`
 Example Request:
 ```json
 {
-  "phoneNumber": "+1234567890",
-  "accountId": "account_123"
+  "SenderPhoneNumber": "+15551234567",
+  "ReceiverPhoneNumber": "+15557654321",
+  "Message": "Hello, this is a test message."
 }
 ```
 
 Example Response:
 ```json
 {
-  "canSend": true,
-  "remainingQuota": 3
+    "success": true,
+    "message": "Message sent successfully."
 }
 ```
 ---
