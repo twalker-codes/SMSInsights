@@ -24,6 +24,23 @@ public class RateLimiterService : IRateLimiterService
         _maxMessagesGlobalPerSec = maxMessagesGlobalPerSec;
     }
 
+    private string GetTimeWindow()
+    {
+        // Round down to the current second to ensure consistent key usage within the same second
+        var now = DateTime.UtcNow;
+        return now.ToString("yyyyMMddHHmmss");
+    }
+
+    private string GetSenderKey(string senderPhoneNumber)
+    {
+        return $"rate_limit:{senderPhoneNumber}:{GetTimeWindow()}";
+    }
+
+    private string GetGlobalKey()
+    {
+        return $"global_rate_limit:{GetTimeWindow()}";
+    }
+
     /// <summary>
     /// Checks if a sender can send a message based on rate limits.
     /// </summary>
@@ -31,7 +48,7 @@ public class RateLimiterService : IRateLimiterService
     /// <returns>True if the sender is within limits, otherwise false.</returns>
     public bool CanSend(string senderPhoneNumber)
     {
-        var senderKey = $"rate_limit:{senderPhoneNumber}:{DateTime.UtcNow:yyyyMMddHHmmss}";
+        var senderKey = GetSenderKey(senderPhoneNumber);
         return _redisService.IncrementWithExpiration(senderKey, _maxMessagesPerSenderPerSec);
     }
 
@@ -41,21 +58,39 @@ public class RateLimiterService : IRateLimiterService
     /// <returns>True if within global rate limits, otherwise false.</returns>
     public bool CanSendGlobal()
     {
-        var globalKey = $"global_rate_limit:{DateTime.UtcNow:yyyyMMddHHmmss}";
+        var globalKey = GetGlobalKey();
         return _redisService.IncrementWithExpiration(globalKey, _maxMessagesGlobalPerSec);
     }
 
     public int GetGlobalUsagePercentage()
     {
-        var globalKey = $"global_rate_limit:{DateTime.UtcNow:yyyyMMddHHmmss}";
-        var currentCount = _redisService.GetCount(globalKey);
-        return (int)((currentCount * 100.0) / _maxMessagesGlobalPerSec);
+        var currentWindow = GetTimeWindow();
+        var previousWindow = DateTime.UtcNow.AddSeconds(-1).ToString("yyyyMMddHHmmss");
+        
+        var currentKey = $"global_rate_limit:{currentWindow}";
+        var previousKey = $"global_rate_limit:{previousWindow}";
+        
+        var currentCount = _redisService.GetCount(currentKey);
+        var previousCount = _redisService.GetCount(previousKey);
+        
+        // Use the higher count between current and previous second
+        var maxCount = Math.Max(currentCount, previousCount);
+        return (int)((maxCount * 100.0) / _maxMessagesGlobalPerSec);
     }
 
     public int GetSenderUsagePercentage(string senderNumber)
     {
-        var senderKey = $"rate_limit:{senderNumber}:{DateTime.UtcNow:yyyyMMddHHmmss}";
-        var currentCount = _redisService.GetCount(senderKey);
-        return (int)((currentCount * 100.0) / _maxMessagesPerSenderPerSec);
+        var currentWindow = GetTimeWindow();
+        var previousWindow = DateTime.UtcNow.AddSeconds(-1).ToString("yyyyMMddHHmmss");
+        
+        var currentKey = $"rate_limit:{senderNumber}:{currentWindow}";
+        var previousKey = $"rate_limit:{senderNumber}:{previousWindow}";
+        
+        var currentCount = _redisService.GetCount(currentKey);
+        var previousCount = _redisService.GetCount(previousKey);
+        
+        // Use the higher count between current and previous second
+        var maxCount = Math.Max(currentCount, previousCount);
+        return (int)((maxCount * 100.0) / _maxMessagesPerSenderPerSec);
     }
 }

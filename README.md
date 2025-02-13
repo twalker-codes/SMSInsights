@@ -133,13 +133,14 @@ The application will be available at: `http://localhost:3000`
 ---
 
 ## 📝 API Endpoints
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/message/send` | Check if an SMS can be sent without exceeding limits |
+| `POST` | `/api/message/send` | Sends an SMS message after checking rate limits. |
+| `GET` | `/api/metrics/global` | Retrieves global SMS usage metrics. |
+| `GET` | `/api/metrics/sender/{senderNumber}` | Retrieves usage metrics for a specific sender. |
+| `GET` | `/api/health` | Provides a health check status of the service. |
 
-
-Example Request:
+Example Request for Sending an SMS:
 ```json
 {
   "SenderPhoneNumber": "+15551234567",
@@ -155,34 +156,6 @@ Example Response:
     "message": "Message sent successfully."
 }
 ```
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `api/metrics/global` | Provides global usage percentage |
-
-
-Example Request:
-```json
-{
-    "usagePercentage": 0,
-    "timestamp": "2025-02-13T13:42:35.630031Z"
-}
-```
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/metrics/sender/{{testSender}}` | Provides sender usage percentage |
-
-
-Example Request:
-```json
-{
-    "senderNumber": "+15551234567",
-    "usagePercentage": 0,
-    "timestamp": "2025-02-13T13:42:45.494228Z"
-}
-```
-
 ---
 
 
