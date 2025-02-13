@@ -65,9 +65,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Add CORS before routing
 app.UseCors("AllowReactClient");
 
-// Register messaging endpoints.
+// Add routing middleware
+app.UseRouting();
+
+// Add health check endpoint first
+app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow }))
+    .WithName("Health")
+    .WithOpenApi();
+
+// Register messaging endpoints
 app.RegisterMessagingEndpoints();
 
 app.Run();

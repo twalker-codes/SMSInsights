@@ -12,13 +12,7 @@ function SenderDashboard() {
   async function fetchSenderUsage() {
     if (phoneNumber.trim() === '') return;
     try {
-      let url = `${API_ENDPOINTS.senderUsage}?phone=${encodeURIComponent(phoneNumber)}`;
-      if (fromDate) {
-        url += `&fromDate=${encodeURIComponent(fromDate)}`;
-      }
-      if (toDate) {
-        url += `&toDate=${encodeURIComponent(toDate)}`;
-      }
+      const url = `${API_ENDPOINTS.senderUsage}/${encodeURIComponent(phoneNumber)}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error('Network error');
       const data = await response.json();

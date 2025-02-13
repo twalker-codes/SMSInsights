@@ -28,6 +28,11 @@ public static class MessagingEndpoints
         app.MapGet("/api/metrics/sender/{senderNumber}", GetSenderMetrics)
             .WithTags("Monitoring")
             .WithOpenApi();
+
+        // Add a health check endpoint
+        app.MapGet("/api/health", () => Results.Ok(new { Status = "Healthy" }))
+            .WithTags("Health")
+            .WithOpenApi();
     }
 
     /// <summary>

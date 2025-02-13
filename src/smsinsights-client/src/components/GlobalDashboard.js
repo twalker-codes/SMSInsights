@@ -31,10 +31,10 @@ function GlobalDashboard() {
       {globalUsage ? (
         <Box>
           <Typography variant="body1">
-            Messages per second: {globalUsage.currentCount} / {globalUsage.maxCount}
-          </Typography>
-          <Typography variant="body1">
             Usage: {globalUsage.usagePercentage}%
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            Last Updated: {new Date(globalUsage.timestamp).toLocaleString()}
           </Typography>
         </Box>
       ) : (
