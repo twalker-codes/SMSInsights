@@ -10,33 +10,53 @@ using SmsInsights.Api;
 var builder = WebApplication.CreateBuilder(args);
 
 // Load configuration settings
-var appSettings = new ApplicationSettings();
-builder.Configuration.GetSection("ApplicationSettings").Bind(appSettings);
+var appSettings = builder.Configuration.GetSection("ApplicationSettings").Get<ApplicationSettings>();
+if (appSettings == null)
+{
+    appSettings = new ApplicationSettings();
+    Log.Warning("Application settings not found. Using default values.");
+}
 builder.Services.AddSingleton(appSettings);
 
-// Configure Redis
+// Use the ReactClient settings from the ApplicationSettings
+var reactClientOrigin = appSettings.ReactClient.Origin;
+
+// Add CORS configuration to allow requests from the React client.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactClient", policy =>
+    {
+        policy.WithOrigins(reactClientOrigin)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// Configure Redis and other services as usual...
 var redisConnection = ConnectionMultiplexer.Connect(appSettings.Redis.ConnectionString);
 builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnection);
-
-// Register Redis service and rate limiter service
 builder.Services.AddSingleton<IRedisService, RedisService>();
 builder.Services.AddSingleton<IRateLimiterService>(sp => new RateLimiterService(
-    sp.GetRequiredService<IRedisService>(), 
-    appSettings.RateLimits.MaxMessagesPerSenderPerSec, 
+    sp.GetRequiredService<IRedisService>(),
+    appSettings.RateLimits.MaxMessagesPerSenderPerSec,
     appSettings.RateLimits.MaxMessagesGlobalPerSec
 ));
-
 builder.Services.AddSingleton<IMessageService, MessageService>();
 
-// Add Swagger services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
-// Replace direct endpoint mapping with MessagingEndpoints registration
+app.UseCors("AllowReactClient");
+
+// Register messaging endpoints.
 app.RegisterMessagingEndpoints();
 
 app.Run();
