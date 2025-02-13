@@ -15,12 +15,13 @@ function ApiHealth() {
           headers: {
             'Accept': 'application/json',
           },
+          signal: AbortSignal.timeout(5000)
         });
         
         const data = await response.json();
         
         if (!response.ok) {
-          throw new Error(data.message || 'API returned an error status');
+          throw new Error(data.message || `API returned status ${response.status}`);
         }
         
         setIsHealthy(data.status === 'Healthy');
@@ -29,12 +30,18 @@ function ApiHealth() {
       } catch (err) {
         console.error('Health check failed:', err);
         setIsHealthy(false);
-        setError(err.message);
+        setError(
+          err.name === 'AbortError' 
+            ? 'API request timed out' 
+            : err.name === 'TypeError' && err.message === 'Failed to fetch'
+              ? 'Cannot connect to API server - please check if the server is running'
+              : err.message
+        );
       }
     }
 
     checkHealth();
-    const interval = setInterval(checkHealth, 10000); // Check every 10 seconds
+    const interval = setInterval(checkHealth, 10000);
     return () => clearInterval(interval);
   }, []);
 

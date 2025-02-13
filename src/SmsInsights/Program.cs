@@ -35,9 +35,20 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactClient", policy =>
     {
-        policy.WithOrigins(reactClientOrigin)
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        if (builder.Environment.IsDevelopment())
+        {
+            // More permissive CORS for development
+            policy.SetIsOriginAllowed(origin => true)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
+        else
+        {
+            // Strict CORS for production
+            policy.WithOrigins(reactClientOrigin)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
     });
 });
 
@@ -65,16 +76,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Add CORS before routing
+// Ensure CORS is configured before other middleware
 app.UseCors("AllowReactClient");
 
 // Add routing middleware
 app.UseRouting();
-
-// Add health check endpoint first
-app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow }))
-    .WithName("Health")
-    .WithOpenApi();
 
 // Register messaging endpoints
 app.RegisterMessagingEndpoints();

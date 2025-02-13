@@ -29,10 +29,13 @@ public static class MessagingEndpoints
             .WithTags("Monitoring")
             .WithOpenApi();
 
-        // Add a health check endpoint
-        app.MapGet("/api/health", () => Results.Ok(new { Status = "Healthy" }))
-            .WithTags("Health")
-            .WithOpenApi();
+        // Update the health check endpoint
+        app.MapGet("/api/health", () => Results.Ok(new { 
+            Status = "Healthy", 
+            Timestamp = DateTime.UtcNow 
+        }))
+        .WithTags("Health")
+        .WithOpenApi();
     }
 
     /// <summary>
