@@ -16,6 +16,7 @@
 - 🏗 **.NET Core 7+**
 - 🏗 **ASP.NET Core Web API**
 - 🏗 **Redis (for distributed rate limiting)**
+- 🏗 **React (provides a dashboard client)**
 
 
 ---
@@ -78,6 +79,59 @@ API will be available at: `http://localhost:5000`
 
 ---
 
+## 🖥 Setting Up and Running the React Client (smsinsights-client)
+
+### 1️⃣ Prerequisites
+Ensure you have the following installed:
+- 📌 [Node.js](https://nodejs.org/) (Recommended: Latest LTS version)
+- 📌 [Yarn](https://yarnpkg.com/) or `npm` (for package management)
+
+### 2️⃣ Navigate to the Client Directory
+```sh
+cd smsinsights-client
+```
+
+### 3️⃣ Install Dependencies
+Using Yarn:
+```sh
+yarn install
+```
+Or using npm:
+```sh
+npm install
+```
+
+### 4️⃣ Configure API Endpoint
+The API URL is stored in `config.js`. Update this file if necessary to point to the correct backend service:
+
+```js
+const API_BASE_URL = "http://localhost:5000";
+
+const API_ENDPOINTS = {
+  globalUsage: `${API_BASE_URL}/api/globalUsage`,
+  senderUsage: `${API_BASE_URL}/api/senderUsage`,
+  sendMessage: `${API_BASE_URL}/api/message/send`
+};
+
+export default API_ENDPOINTS;
+```
+
+Modify `API_BASE_URL` if your backend is running on a different host or port.
+
+### 5️⃣ Run the Client
+Using Yarn:
+```sh
+yarn start
+```
+Or using npm:
+```sh
+npm start
+```
+
+The application will be available at: `http://localhost:3000`
+
+---
+
 ## 📝 API Endpoints
 
 | Method | Endpoint | Description |
@@ -101,7 +155,38 @@ Example Response:
     "message": "Message sent successfully."
 }
 ```
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `api/metrics/global` | Provides global usage percentage |
+
+
+Example Request:
+```json
+{
+    "usagePercentage": 0,
+    "timestamp": "2025-02-13T13:42:35.630031Z"
+}
+```
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/metrics/sender/{{testSender}}` | Provides sender usage percentage |
+
+
+Example Request:
+```json
+{
+    "senderNumber": "+15551234567",
+    "usagePercentage": 0,
+    "timestamp": "2025-02-13T13:42:45.494228Z"
+}
+```
+
 ---
+
+
+The application will be available at: http://localhost:3000
 
 ## 📦 NuGet Packages Used
 
