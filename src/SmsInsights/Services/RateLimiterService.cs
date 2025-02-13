@@ -10,6 +10,7 @@ public class RateLimiterService : IRateLimiterService
     private readonly IRedisService _redisService;
     private readonly int _maxMessagesPerSenderPerSec;
     private readonly int _maxMessagesGlobalPerSec;
+    private readonly int _metricsWindowSeconds;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RateLimiterService"/> class.
@@ -17,28 +18,36 @@ public class RateLimiterService : IRateLimiterService
     /// <param name="redisService">The generic Redis service.</param>
     /// <param name="maxMessagesPerSenderPerSec">The max messages a sender can send per second.</param>
     /// <param name="maxMessagesGlobalPerSec">The max messages the system allows globally per second.</param>
-    public RateLimiterService(IRedisService redisService, int maxMessagesPerSenderPerSec, int maxMessagesGlobalPerSec)
+    /// <param name="metricsWindowSeconds">The size of the metrics window in seconds.</param>
+    public RateLimiterService(
+        IRedisService redisService, 
+        int maxMessagesPerSenderPerSec, 
+        int maxMessagesGlobalPerSec,
+        int metricsWindowSeconds = 10)  // Default to 10 seconds
     {
         _redisService = redisService;
         _maxMessagesPerSenderPerSec = maxMessagesPerSenderPerSec;
         _maxMessagesGlobalPerSec = maxMessagesGlobalPerSec;
+        _metricsWindowSeconds = metricsWindowSeconds;
     }
 
-    private string GetTimeWindow()
+    private IEnumerable<string> GetTimeWindows()
     {
-        // Round down to the current second to ensure consistent key usage within the same second
         var now = DateTime.UtcNow;
-        return now.ToString("yyyyMMddHHmmss");
+        for (int i = 0; i < _metricsWindowSeconds; i++)
+        {
+            yield return now.AddSeconds(-i).ToString("yyyyMMddHHmmss");
+        }
     }
 
     private string GetSenderKey(string senderPhoneNumber)
     {
-        return $"rate_limit:{senderPhoneNumber}:{GetTimeWindow()}";
+        return $"rate_limit:{senderPhoneNumber}:{GetTimeWindows().First()}";
     }
 
     private string GetGlobalKey()
     {
-        return $"global_rate_limit:{GetTimeWindow()}";
+        return $"global_rate_limit:{GetTimeWindows().First()}";
     }
 
     /// <summary>
@@ -64,34 +73,18 @@ public class RateLimiterService : IRateLimiterService
 
     public int GetGlobalUsagePercentage()
     {
-        var currentWindow = GetTimeWindow();
-        var previousWindow = DateTime.UtcNow.AddSeconds(-1).ToString("yyyyMMddHHmmss");
-        
-        var currentKey = $"global_rate_limit:{currentWindow}";
-        var previousKey = $"global_rate_limit:{previousWindow}";
-        
-        var currentCount = _redisService.GetCount(currentKey);
-        var previousCount = _redisService.GetCount(previousKey);
-        
-        // Use the higher count between current and previous second
-        var maxCount = Math.Max(currentCount, previousCount);
-        return (int)((maxCount * 100.0) / _maxMessagesGlobalPerSec);
+        var windows = GetTimeWindows();
+        var counts = windows.Select(w => _redisService.GetCount($"global_rate_limit:{w}"));
+        var totalCount = counts.Sum();
+        return (int)((totalCount * 100.0) / (_maxMessagesGlobalPerSec * _metricsWindowSeconds));
     }
 
     public int GetSenderUsagePercentage(string senderNumber)
     {
-        var currentWindow = GetTimeWindow();
-        var previousWindow = DateTime.UtcNow.AddSeconds(-1).ToString("yyyyMMddHHmmss");
-        
-        var currentKey = $"rate_limit:{senderNumber}:{currentWindow}";
-        var previousKey = $"rate_limit:{senderNumber}:{previousWindow}";
-        
-        var currentCount = _redisService.GetCount(currentKey);
-        var previousCount = _redisService.GetCount(previousKey);
-        
-        // Use the higher count between current and previous second
-        var maxCount = Math.Max(currentCount, previousCount);
-        return (int)((maxCount * 100.0) / _maxMessagesPerSenderPerSec);
+        var windows = GetTimeWindows();
+        var counts = windows.Select(w => _redisService.GetCount($"rate_limit:{senderNumber}:{w}"));
+        var totalCount = counts.Sum();
+        return (int)((totalCount * 100.0) / (_maxMessagesPerSenderPerSec * _metricsWindowSeconds));
     }
 
     public int GetCountForKey(string key)

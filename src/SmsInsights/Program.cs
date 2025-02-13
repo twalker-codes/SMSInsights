@@ -61,7 +61,8 @@ builder.Services.AddSingleton<IRedisService, RedisService>();
 builder.Services.AddSingleton<IRateLimiterService>(sp => new RateLimiterService(
     sp.GetRequiredService<IRedisService>(),
     appSettings.RateLimits.MaxMessagesPerSenderPerSec,
-    appSettings.RateLimits.MaxMessagesGlobalPerSec
+    appSettings.RateLimits.MaxMessagesGlobalPerSec,
+    appSettings.RateLimits.MetricsWindowSeconds
 ));
 builder.Services.AddSingleton<IMessageService, MessageService>();
 

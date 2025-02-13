@@ -29,6 +29,7 @@ public class RateLimitSettings
 {
     public int MaxMessagesPerSenderPerSec { get; set; }
     public int MaxMessagesGlobalPerSec { get; set; }
+    public int MetricsWindowSeconds { get; set; } = 10;
 }
 
 /// <summary>
