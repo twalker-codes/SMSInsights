@@ -87,6 +87,7 @@ app.UseRouting();
 
 // Register messaging endpoints
 app.RegisterMessagingEndpoints();
+app.RegisterHealthEndpoints();
 
 app.Run();
 Log.CloseAndFlush();

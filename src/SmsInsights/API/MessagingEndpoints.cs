@@ -28,43 +28,6 @@ public static class MessagingEndpoints
         app.MapGet("/api/metrics/sender/{senderNumber}", GetSenderMetrics)
             .WithTags("Monitoring")
             .WithOpenApi();
-
-        // Update the health check endpoint
-        app.MapGet("/api/health", async (HttpContext context) => 
-        {
-            try
-            {
-                // Simple Redis check
-                var redisService = context.RequestServices.GetRequiredService<IRedisService>();
-                var isRedisConnected = await Task.Run(() => {
-                    try
-                    {
-                        redisService.GetCount("health_check");
-                        return true;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                });
-
-                if (!isRedisConnected)
-                {
-                    return Results.StatusCode(503);
-                }
-
-                return Results.Ok(new { 
-                    status = "Healthy", 
-                    timestamp = DateTime.UtcNow
-                });
-            }
-            catch
-            {
-                return Results.StatusCode(500);
-            }
-        })
-        .WithTags("Health")
-        .WithOpenApi();
     }
 
     /// <summary>
