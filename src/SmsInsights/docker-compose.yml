@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - sms-insights-network
+
+networks:
+  sms-insights-network:
+    name: ${COMPOSE_PROJECT_NAME}-network
+
+volumes:
+  redisdata:
+    name: ${COMPOSE_PROJECT_NAME}-redisdata 
